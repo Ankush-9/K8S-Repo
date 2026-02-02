@@ -1,0 +1,79 @@
+# Kubernetes (K8S):
+
+~ Kubernetes is a free and open source tool/software.
+~ Kubernetes is developed by Google and currently being maintained by CNCF (Cloud Native Computing Foundation).
+~ Go Programming Language has been used to develop Kubernetes
+
+~ Kubernetes is an orchestration Platform.
+~ Used to manage Containers( create/start/stop/delete/scale-up/scale-down).
+~ It provides framework for managing the complex task of deploying an application, scaling and operating applications in containers.
+
+* Kubernetes is basically used to deploy the application.
+ —> Also no. Of instances can be increased/decreased ,scaled up/down as per traffic ,management and maintenance of application can be performed using K8S.
+ —> Also monitoring of app comes under K8S which has further 2 sub-divisions 
+	1) Monitoring the application
+	2) Monitoring the infrastructure
+
+~ For now, Kubernetes is used to deploy applications,It is easy to scale, manage and monitor application using K8S.  
+
+~ Major Advantages of K8S ~
+    	1) Self Healing : If any container gets crashed or encounters a major issue, it is replaced with a new container.
+	2) Auto-scaling : Based on demand or traffic the no. Of containers are scaled up or scaled down.
+	3) Load Balancing : Load will be distributed among all containers which are up and running.
+
+# Difference between Docker and K8S : 
+
+~ Docker is famous for containerisation (packaging our app code and dependencies as a single unit for execution) while,
+    K8S is famous for orchestration platform(management of containers)
+
+# Kubernetes Architecture :
+
+~ Here, we use multiple nodes I.e. we use the concept of cluster(multiple machines) here
+~ We directly work on the Control node, which takes care of operations on the Worker node 
+~ In Industry for 85% cases we use the provider’s Clusters and in that as well most popular is the AWS EKS
+
+1. Control Node/Plane(Master Node) : 
+	—> API Server
+	—> Schedular
+	—> Controller Manager
+	—> ETCD	
+2. Worker Node :
+	—> kublet
+	—> kube proxy
+	—> POD
+	—> Container
+	—> Docker
+
+~ To deploy our app using K8S we need to communicate with Control Plane,The master node
+~ We Create a machine on our cloud where we install and use KUBECTL (CLI) to communicate with control plane
+~ We have many components within Control and worker nodes
+
+—> API Server : It will receive the request given by KUBECTL and stores the request with pending status in the database of our cluster i.e. ETCD
+—> Schedular : It identifies the pending tasks/requests in ETCD and it identifies worker node to schedule the task using kubelet present in each Worker node
+—> Controller Manager : The duty of Controller Manager is to verify all tasks (Proper working of tasks as per expectations)
+—> ETCD : It is an internal database of k8s cluster
+
+—> kubelet : Schedular identifies worker node using kubelet. kubelet is  a node agent which maintains information about all worker nodes
+—> kube-proxy : It provides network for cluster-communication. It is basically used to take care of networking in K8S cluster
+—> PODS :  Pod is the smallest building block in K8S cluster. Every App is deployed as a pod in k8s. We can have multiple pods for a single instance of an application
+—> Containers : Containers are running instances of an application which are present inside Pods.
+—> Docker : It is installed in every Worker Node to take care of Containerization i.e. to run the Docker containers
+
+# Notes:
+
+*API Server is the entry point for all our commands.
+*Generally everything in Kubernetes is represented as a pod.
+*To Create a pod we use yml file which is often referred as Manifest yml (within which we will configure our Docker Images)
+*If a Pod is damaged/deleted/crashed then k8s will create a new Pod(Self-healing property)
+*If an app runs on multiple pods then K8S automatically distributed the load to all the pods(Load Balancing Property) with the help of Load Balancers
+*Pods can be increased or decreased automatically based on the traffic/load (Auto-Scaling property)
+
+# K8S Cluster Setup :
+
+~ Mini Cube —> Single node Cluster —> Only for practice or to get started with k8s
+
+~ Kubeadm Cluster —> Self managed cluster —> We manage and are responsible for everything
+
+~ Provider Managed Cluster —> Ready Made Cluster —> Provider will take care of everything
+	—> eg. AWS EKS ,AZURE AKS, GCP GKE etc…….
+	-> Provider Managed Clusters are paid(chargeable)
