@@ -1,0 +1,66 @@
+# Creating EKS Cluster (using eksctl)~
+
+~ eksctl create cluster —name Ankush99-cluster1 —region ap-south-1 —node-type t2.medium —zones ap-south-1a,ap-south-1b
+~ This command is zone and region specific  
+~ Ankush99-cluster is the name of the cluster in the region ap-south-1 
+~ It takes up to 5-10 mins of time for the creation of cluster this is because we are using AWS-EKS cluster
+~ We haven’t specified any no. Of units for creation of components like Control Plane,Worker Node and so but, by default 1 Control Plane and 2 Worker Nodes will be created 
+~ We can specify the required no. Of worker nodes while there exists only 1 Control Plane
+~ It is a chargeable Service i.e. for using these services bills are charged
+
+~ Once the cluster is created ,the cluster information is automatically stored in the EKS-Host machine.This is because kubectl ,aws-cli and eksctl are installed in the host machine
+~ A directory named as .kube ,where config directory will be created (K8S Configuration)
+~ If in future we desire to establish a connection to this Cluster we’ll be required to first set up the .kube and config file for successful connection
+
+*After The Cluster is created we get the following message
+	EKS cluster “Ankush99-cluster1” in “ap-south-1” region is ready
+
+*We also get this message ~
+	kubectl command should work with “/home/ubuntu/.kube/config”,try ‘kubectl get nodes’
+	—> This is a very important message
+	—> Configuration file in our EKS host machine where we have a client(kubectl) software to manipulate a cluster
+	—> /home/ubuntu/.kube/config —> This file is added automatically in our machine but if we want to use/access cluster from some other machine we have to configure it manually
+
+# Deleting the Cluster ~
+
+~ If we want to delete a Cluster after creation we use the following command
+~ eksctl delete cluster --name Ankush99-cluster1 —region ap-south-1
+
+# Notes :
+
+~ cat /home/ubuntu/.kube/config
+~ This command is used to get information about contents of created /.kube/config files
+~ We get an id called certificate-authority-data , which is basically responsible for establishing the connection between EKS cluster and machine —> It is basically a key
+~ We can check Information about the cluster we can check it by clicking on the created cluster on our AWS web console
+~ Under Compute —> We have Node groups where desired size is 2 —> basically it refers to the Worker Nodes
+~ If we go to instances we’ll observe two new instances which are the worker nodes
+~ We cannot connect to these instances as they do not have a .pem(key) —> We can but requires a lot of setup —> We are using Amazon’s EKS setup
+~ The Cluster(Ankush99-cluster1) is the Control Plane
+
+# PODS :
+
+~ Whenever an Application is deployed it is in the container and container is inside in the POD component
+~ Pods are not exposed outside
+~ To expose pods where our application is present Sevices comes into picture
+~ Pod is a short lived object like a machine i.e. if our app is crashed Pod is deleted
+
+# K8S Services :
+
+~ This service is used to expose our pods
+~ We have 3 types of services in k8s
+	—> Cluster IP
+	—> Node Port Service
+	—> Load Balancer
+
+—> Cluster IP : Pod is a short lived object.As long as instance of application is there pod is active.If Pod is damaged/deleted/crashed then K8S will replace it with a new Pod.For every Pod we have an Ip and for every replacement a new ip is allocated 			 for replaced pod.So, it is not recommended to access pods using the ip of pods.So,we use the Cluster Ip service to link all the Pod IP’s to single cluster IP.
+			 Cluster IP service is used to link all PODS to a single IP.
+			 Cluster IP is a static IP to access PODS.
+			 Using Cluster IP we can access PODS only within the Cluster.
+
+—> Node Port Service : Node Port Service is used to expose our pods outside the cluster.
+					 Using Node Port Service we can access our app with worker node public IP address.
+					 When we use this service to access our POD then all the requests will go to the same worker node thereby creating a burden on the node.
+					 To distribute the load to multiple worker nodes we use the Load Balancer Service.	
+
+—> Load Balancer : It is used o expose our pods outside the cluster using AWS LoadBalancer.
+				   When we access the Load balancer url, requests will be distributed to all pods running in all worker nodes.
