@@ -1,0 +1,129 @@
+# K8S Manifest YML Syntax :
+
+~ In K8S we use Manifest YML to deploy our app (.yml file)
+~ Syntax :
+	—>  - - - (Starting Point) 
+	—>  . . .  (Ending Point)
+~ With respect to K8S we have four important components in a YML file
+	—> apiversion: <version-number>
+			It specifies the version to use for the resource (depends on kind)
+	—> kind: <resource-type>
+			It species the type of K8S service to be created by the user(Pod, Service, Deployment etc.) —> It is case sensitive.
+	—> metadata: <name/label>
+			It specifies the basic information about the resource.
+			We should specify labels for use in future as it helps services/deployment to select a specific Pod(key-value metadata).
+			
+	—> spec: <information about the container>
+			It specifies the container information
+			Basically it is the specification of the k8s object (traffic routing, container details and so on) 
+
+~ Execute k8s manifest file
+~ We have a command to run/execute the k8s manifest yml file which is as ~ 
+	kubectl apply -f <manifest-yml-file-name> 
+
+# K8S POD Manifest YML :
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: webapp
+  labels:
+    app: ankushwebapp
+spec:
+  containers:
+    - name: javawebappcontainer
+      image: hacker123shiva/springbt-in-docker:latest
+      ports:
+        - containerPort: 8080
+...
+
+# Running the yml ~
+	
+~ kubectl apply -f <manifest-yml-file-name>
+
+# Commands :
+
+~ kubectl get pods -o wide : It lists all pods in the current namespace with some extra details compared to normal “kubectl get pods” command
+~ kubectl describe pod <pod-name> : It is useful for debugging if pod crashed as this command gives a very detailed information about a pod
+~ kubectl get service : This command is used to get information about services
+~ kubectl delete all --all : It is used to delete all the operations performed using the manifest-yml
+
+
+# Notes :
+
+~ Out of three services in K8S By default Cluster IP is created
+~ Using Cluster IP we can access pod Inside the cluster
+ 
+*We are required to write a separate manifest yml file to create Node Port Service and Load Balancer
+
+# K8S Servie Manifest Yml :
+
+---
+apiVersion: v1
+kind: Service
+metadata: 
+  name: webappservice
+spec:
+  type: LoadBalancer
+  selector: 
+    app: ankushwebapp
+  ports:
+    - port: 80
+      targetPort: 8080
+...
+
+
+*80 is the default port, We do not need to explicitly mention it to browser while accessing the app
+
+~ We can access our application using load balancer dns url (from AWS web console)
+~ We can also create a common yml file for both services and pods
+
+# K8S POD and Service in single yml file :
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: webapp
+  labels:
+    app: ankushwebapp
+spec:
+  containers:
+    - name: javawebappcontainer
+      image: hacker123shiva/springbt-in-docker:latest
+      ports:
+        - containerPort: 8080
+
+---
+apiVersion: v1
+kind: Service
+metadata: 
+  name: webappservice
+spec:
+  type: LoadBalancer
+  selector: 
+    app: ankushwebapp
+  ports:
+    - port: 80
+      targetPort: 8080
+...
+
+# Note regarding ports:
+
+   ports:
+        - containerPort: 8080 —> Application port no. 
+
+	
+  ports:
+    - port: 80  —>  It refers to Load balancer port no.
+      targetPort: 8080 	—> Container’s port no. Inside the Pod
+
+# Note regarding manifest-yml :
+
+~ kind: Pod —> Creates a Pod
+~ metadata.name —> webapp —> Pod Name
+~ labels.app —> Label ,used by selector to find this Pod
+~ containers —> Pod runs a container
+~ name —> javawebappcontainer —> Container name
+~ image —> Application’s Docker image
