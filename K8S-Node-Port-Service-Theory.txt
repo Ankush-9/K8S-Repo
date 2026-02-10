@@ -1,0 +1,68 @@
+# K8S Nodeport Service :
+
+~ Node-port Service is one of the k8s pod exposing service to access the pods from outside the cluster
+~ Using Node-port service we can access the pod using the public ip of the worker node
+
+*It’s not recommended to combine manifest-files as it causes management overhead
+
+~ We have a cluster and a machine which acts as a client to get connected to our cluster
+~ We have various softwares to operate on our cluster( kubectl ,aws-cli, eksctl)
+~ (Refer to basic Diagram on K8S Provider Managed Cluster)
+
+~ The Worker node on which a Pod resides or gets created is not decided by us
+~ Inside Pod we have our applications
+~ Everything is a pod in K8S
+~ To expose this pod we have previously used LoadBalancer ,now we’ll be working with Node-Port
+
+Eg. Node-port Service Manifest YML File
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: webapp
+  labels:
+    app: ankushwebapp
+spec: 
+  containers:
+    - name: javawebappcontainer
+      image: hacker123shiva/springbt-in-docker:latest
+      ports:
+        - containerPort: 8080
+          
+---       
+apiVersion: v1
+kind: Service
+metadata:
+  name: webappservice
+spec:
+  type: NodePort
+  selector:
+    app: ankushwebapp
+  ports:
+    - port: 80
+      targetPort: 8080
+...     
+
+~ To execute this file use the command
+	kubectl apply -f <manifest-yml-file-name>
+
+~ kubectl get service
+~ kubectl get pods -o wide : gives information about where the pod is located i.e. a particular instance
+~ We get a random port allocated eg. 80:32407/TCP
+~ Now enable 32407 in the security group of instance where the pod is active and access the app using public ip of the worker node i.e the instance
+
+* If we delete the pod and re run the k8s-maifest file we’ll be allocated with a random port no. Eg 80:31461/TCP
+* So, if Node-port no. Is not specified in service manifest file k8s will assign a random node-port no. For the service within the range of 30000 to 32767 
+* However, we can only specify the Node-port number in service manifest yml as ~
+
+ports:
+    - port: 80
+      targetPort: 8080
+      nodePort:30999
+
+~ Also enable 3099 in the security groups of the Worker Node instance
+
+# Demerits :
+~ We are accessing the app using the public Ip of the Worker Node VM
+~ Even if we have 10 worker nodes the traffic will be diverted to only one of the Worker Nodes therefore Out of the three services Load Balancer Service is the most recommended Service to divide the traffic equally
+
