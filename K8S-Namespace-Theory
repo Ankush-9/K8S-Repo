@@ -29,7 +29,9 @@ Commands :
 
 ~ To get information about a pod or service in a particular namespace use the commands as ~
 	kubectl get pods -n <namespace-nae>
-	kubectl get service -n <namepsace-name>
+	kubectl get service -n <namespace-name>
+
+~ kubectl delete ns <name-space-name>  --> This command is used to delete a namepsace by it's name
 
 # Running a Pod in a particular namespace can be performed as ~
 
@@ -47,3 +49,4 @@ spec:
         - containerPort: 8080    
 ...
 
+*After Deleting a namespace all pods and services within it are also deleted.
