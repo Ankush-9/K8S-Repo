@@ -1,0 +1,49 @@
+K8S Namespaces:
+
+~ Namespaces are used to group the resources
+~ eg . Frontend-app-pods —> frontend-app-ns
+	   Backend-app-pods —> backend-app-ns
+	   Database-pods —> database-ns
+
+~ We can perform the above in K8S Namespaces but if we delete the Namespace whatever resources are present in a namespace, they get delete as well
+~ By default we have 4 namespaces
+~ If we do not mention any namespace while the pod creation in the manifest file we’ll be working on default namespace
+~ The other 3 namespaces are for internal cluster operations
+
+*We can create our own namespace by using the following command ~ 
+~ kubectl create ns ankush-ns
+~ kubectl get namespace
+
+*We can also create a namespace using the manifest file ~
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ankush-ns-2
+...
+
+Commands :
+
+~ kubectl get ns or ,  			—> This command lists all the namespaces 
+   Kubectl get namspace
+
+~ To get information about a pod or service in a particular namespace use the commands as ~
+	kubectl get pods -n <namespace-nae>
+	kubectl get service -n <namepsace-name>
+
+# Running a Pod in a particular namespace can be performed as ~
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: webapp
+  namespace: ankush-ns
+spec:
+  container
+    - name: javawebcontainer
+      image: hacker123shiva/springbt-in-docker:latest
+      ports:
+        - containerPort: 8080    
+...
+
