@@ -32,7 +32,9 @@ Eg. Pod : v1
 	Specification of the K8S object,It defines how the traffic is routed for services and the container details for Pods
 	(Contains container info related to image name, port mapping , environment variables and so on……)
 
-  
+--> Labels : As we create multiple pods of the same application, all these pods have different names but to group all of them so as to have only 1 application with multiple pods we give label name to group them.
+
+--> Selector : Selector is used to select pods with same labesl  
 
 
 
