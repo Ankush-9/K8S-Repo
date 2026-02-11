@@ -1,0 +1,38 @@
+Notes :
+
+Summary ~
+Everything in K8S manifest file is case sensitive.
+Eg. Pod is correct while POD is incorrect.
+       apiVersion is accepted while ApiVersion is not.
+
+—> apiVersion : It is the version we have to specify (It’s not of our own choice).
+		     Here, using apiVersion we tell K8S which library version to be used for the object being created (kind).
+		     It is predefined. 
+		     Depending on K8S object we want to create we have to specify the corresponding version.
+
+Eg. Pod : v1
+      Service: v1
+      NameSpace : v1
+      ReplicaSet : apps/v1
+      Deployment : apps?v1
+
+*We have to be very careful while defining apiVersion
+
+~ kubectl api-resources : This command is used to get all the resources being used and At the time of specifying we can check what version to use.
+~ kubectl api-versions : It is used to display the API versions currently supported by the Kubernetes API server that your kubectl client is configured to communicate with.
+
+—>  kind : It is used to define the type of Kubernetes object we want to use
+	eg. Pod,Deployment,Service,….etc.
+
+—> metadata : It is used to mention the information about K8S object we’re creating.
+	 eg. name, labels,……etc.
+	name is the name of the deployment while label is the name given to access specific Pod. Label is a key-value pair used for organising and selecting object.
+
+—> spec: <container>
+	Specification of the K8S object,It defines how the traffic is routed for services and the container details for Pods
+	(Contains container info related to image name, port mapping , environment variables and so on……)
+
+  
+
+
+
