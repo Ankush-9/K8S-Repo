@@ -1,0 +1,52 @@
+# K8S ReplicaSet :
+
+~ Replica basically refers to a copy,
+~ This is used for managing multiple replicas of Pods to perform activities like LoadBalancing and scaling
+~ It will create multiple replicas of same pod (we can use same application with multiple pods)
+~ Even if one Pod is deleted, it will automatically create another Pod —> Self-Healing Property of K8S
+~ Depends on the requirement I.e. traffic, we can scale the pods
+
+# ReplicaSet Manifest File :
+
+---
+apiVersion: apps/v1
+kind: ReplicaSet 
+metadata:
+  name: productreplicaset 
+  labels:
+    app: ankush
+spec:
+  replicas: 3
+  selector:
+    matchLabels: 
+      app: ankush
+  template: 
+    metadata:
+      labels:
+        app: ankush
+    spec:
+      containers:
+      - name: container1
+        image: hacker123shiva/springbt-in-docker:latest
+...
+
+~ kubectl apply -f <yml-file-name>
+
+# Commands :
+
+~ kubectl get rs —> It will show the replicates created 
+~ kubectl get rs -o wide —> It shows more information about the replicates created
+~ kubectl describe rs <name-of-replicaset> —> It describes the information about a specific replicatset in a detailed manner
+~ kubectl get pods —showl-abels —> It displays the Pods with label names used by selector
+~ kubectl get pods —watch —> It is used to observe what is happening with the pods
+~ kubectl scale rs/<rs-name> —replicas=<no. Of desired instances>  —> It is used to scale either up or scale down as per given no. Of replicas
+~ kubectl delete pods <pod-name> —> It is used to delete a named pod.
+~ kubectl describe pods -l app=<name-of-app> | grep -I Image	 —> It is used to display information about the Image of our app which is used by the pod
+
+# Observations :
+
+*ReplicaSet gives ability to easily run multiple instances of a pod(app)
+*ReplicaSet is not recommended for Application updates/changes to an existing pod created from a manifest-yml file
+*Auto-Scaling is also not possible 
+*Only manual scaling is possible in ReplicaSet
+
