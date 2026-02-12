@@ -1,0 +1,76 @@
+# K8S Deployments :
+
+~ It is one of the K8S resource/component/object recommended to deploy our application where Deployment manages Pod lifecycle.
+~ Benefits associated with K8S-Deployment:
+	—> Self-Healing
+	—> Zero-Down-time
+	—> Rolling updates and Rollback
+
+# create vs apply :
+
+*To execute a manifest-yml file we can also use the following command
+	kubectl create -f <manifest-yml-file-name>
+
+*But, apply has an advantage over create 
+	—> If a resource is pre-available apply updates while create denies any operation
+	—> Both create and apply can be used to create a resource but for an existing resource apply updates it while create displays an error.
+
+~ create —> Always creates a new resource
+~ apply —> Used for updates and creation of resources(idempotent - Do it once or for n no. Of times it won’t through an error)
+
+# K8S-Manifest-Yml for Deployment :
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployemntsvc
+  labels:
+    name: ankush
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: ankush
+  template:
+    metadata:
+      labels:
+        app: ankush
+    spec:
+      containers:
+      - name: container1
+        image: hacker123shiva/springbt-in-docker
+...
+
+*Deployment not only creates Pods but also rs
+
+# Commands :
+~ kubectl get deployment or kubectl get deploy : It is used to list the created deployments
+~ kubectl get deployment -o wide : It displays created deployments with additional information
+~ kubectl describe deployment <deployment-name> : It displays created deployment’s information in a detailed manner
+~ kubectl scale deploy/<deployment-name> —replicas=<no. Of pods> : It is used to either scale up or scale down the no. Of replicas to a specified number
+~ kubectl rollout history deploy/<pod-name> : It displays the history of updates I.e. the no. Of time updates were made
+~ kubectl rollout status deploy/<pod-name> : It displays the status of roll out for a deployment
+~ kubectl rollout undo deploy/<pod-name> : It is used to rollback/undo the changes made to the deployment
+~ kubectl get events ~ It maintains all the information of events being performed in our cluster—> maintains system-level logs about resources
+	—> It will shoe list of events
+		eg. Container image being pulled,
+		       pod starting/stopping,
+		       failed to pull image , etc.	
+~ kubectl delete deploy <deployment-name> : It is used to delete a deployment —> When a deployment is deleted all the resources waiting it are also deleted
+
+# Notes :
+
+~ When we write manifest yml file for Deployment we define no. Of pod counts(replicas) and also the Pod template
+~ Pod template defines what containers are to be executed within pods
+~ K8S creates a replicaset automatically when we create Deployment and the ReplicaSet will create the pods —> “kubectl get rs” gives all pods
+~ It supports self-healing —> If pod dies Replicaset creates a new Pod as a replacement —> same as Replicaset theory
+
+*Deployment supports Rolling updates and Rollback
+—> Important in production
+—> This is not possible in ReplicaSet but possible in Deployment
+
+# Multi-Container-Pod :
+
+~ Multiple Containers for one pod
+~ We an have multiple containers in a single pod
