@@ -1,0 +1,150 @@
+# K8S Jobs :
+
+~ Job is basically an operation 
+	eg. data migration, backups, batch processing , etc…
+~ In K8S we have K8S Jobs, which are resources used to run Batch task in a K8S cluster
+~ They ensure that a specified no. Of pods completes a task before making the job to be done/completed
+	—> Jobs are of two types :
+		~ Parallel Jobs (Parallel Job with completions)
+		~ Non-parallel Jobs (sequential) —>default
+		~ Work Queue (Parallel Job with no fixed completions)
+
+~ Suppose we have two clusters, and we have Job in cluster 1 with some operation and completions=4 ( i.e. 4 Pods created and job is performed in them sequentially)
+	—> create 1st Pod —> Perform Job in it —> create 2nd Pod and so on….Linear order followed.
+	—> It is case of Non-parallel Job
+	—> In non-parallel jobs, the creation of another cluster starts only when a preceding pod dies i.e. gets deleted after task completion
+~  Suppose in the 2nd cluster as well we have a Job ,completions=4 and parallelism=2
+	—> Multiple Pods run simultaneously to complete a task
+	—> What happens in this case is that 4 pods are created and job is being performed in parallel fashion
+	—> i.e. At a time job is performed in 2-2 Pods parallely in one go
+	—> In Parallel Jobs there is no restriction on creation a Pod with respect to another Pod
+	—> If specified no. Of pods complete their task job is considered as complete
+~ Work Queue 
+	—> Pods keep running until the queue is empty; total count isn’t fixed
+		parallelism: 3
+
+# Commands:
+
+~ kubectl get jobs : It is used to list all the created jobs
+~ kubectl logs -l job-name=<job-name> : It is used to get operation level logs of a job
+~ kubectl delete job <job-name> : It is used to delete a Job by name
+~ kubectl get pods : Shows the status of Pods (created/preparing/completed)
+~ kubectl get ds
+~ kubectl get ds -o wide
+~ kubectl describe ds <daemon-set-name> 
+~ kubectl delete ds <daemon-set-name>
+
+# K8S manifest-yml for Non-Parallel Job :
+
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: npjob
+spec:
+  template:
+    metadata:
+      name: non-parallel-pod
+    spec:
+      containers:
+      - name: non-parallel-container
+        image: busybox
+        command: ["echo", "Hello From Ankush --> Non-Parallel-Job"]
+      restartPolicy: Never
+  completions: 3
+...   
+
+# K8S manifest-yml for Parallel Job :
+
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: pjob
+spec:
+  template:
+    metadata:
+      name: parallel-pod
+    spec:
+      containers:
+      - name: parallel-container
+        image: busybox
+        command: ["echo", "Hello From Ankush --> Parallel-Job"]
+      restartPolicy: Never
+  completions: 6
+  parallelism: 2
+...   
+
+* Here at a time two pods will be executing a job I.e. 6 pods will be created with 2-2 working in batches 
+* 2 create and execute , then 2 ,then 2
+# K8S CronJobs :
+
+~ CronJobs are basically used to run scheduled jobs
+	Eg. the manifest-yml below is used to run a job every 1 minute
+
+# K8S manifest-yml for Cron Job :
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cjob
+spec:
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: cron-container
+            image: busybox
+            command: ["echo", "Hello From Ankush --> Cron-Job"]
+          restartPolicy: Never
+  schedule: "*/1 * * * *"
+...   
+
+# K8S DaemonSet :
+
+~ We have two worker nodes by default 
+~ We used to check in which of the Worker nodes our pod is being created
+~ We are not sure about the instance in which our pod gets created
+~ If we want to ensure the Pods to get created in all the worker node ,DaemonSet comes into picture
+	—> The requirement is to collect the logs from all the nodes
+*Using ReplicaSet or Deployment we aren’t guaranteed that Pods run in each of the worker nodes in the cluster
+*DaemonSet gives us the flexibility to get assurance in this matter
+*Every Copy of Pod runs in every node
+
+~ Benefits of DaemonSet :
+	—> Fluentd
+	—> FileBeat
+	—> Logstash
+
+~ Monitoring agents :
+	—> Prometheus Node Exporter
+	—> Datadog agent
+
+*In DaemonSet we do not specify replicas, however daemonSet will ensure to create one Pod per node
+*If we delete a new Worker node or delete a Node from a Cluster automatically the DaemonSet adds or deletes Pods as per the scenario
+*Also the concept of Self-healing works here
+
+# K8S DaemonSet maifest-yml :
+
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: daemon-app
+  labels:
+    app: ankush
+spec:
+  selector:
+    matchLabels:
+      app: ankush
+  template:
+    metadata:
+      labels:
+        app: ankush
+    spec:
+      containers:
+      - name: container1
+        image: hacker123shiva/springbt-in-docker:latest
+...
+
