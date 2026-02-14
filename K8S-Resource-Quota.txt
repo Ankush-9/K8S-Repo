@@ -1,0 +1,68 @@
+# Resource-Quota :
+
+~ We have studied about namespaces where namespaces are used to group resources(pods)
+~ K8S cluster can be divided into namespaces
+~ All Pods running in the K8S observed so far have not been set to limit for any resources
+
+~ The Pods in K8S will run with no limitations of memory and CPU by default
+~ We can limit the Pod w.r.t. setting the limits for CPU,memory or storage by creating a namespace
+
+~ In this namespace we configure some limitations , I.e. only one CPU,One GB of RAM, etc.
+	—>  The Pods are created only until the limit is reached
+~ For now, we have never added arguments(resource Limitations) for Pods , But we can specify it in the yml file itself
+
+*It’s like creating an isolated network
+
+Eg. resource-quota-namespace.yml
+---
+apiVersion: v1 
+kind: ResourceQuota
+metadata:
+  name: rq-app
+  namespace: ankush-ns
+spec:
+  hard:
+    pods: "5"
+    limits.cpu: "1"
+    limits.memory: 1Gi
+...
+
+
+Eg. resource-quoda-deployment.yml
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployemntsvc
+  labels:
+    name: ankush
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: ankush
+  template:
+    metadata:
+      labels:
+        app: ankush
+    spec:
+      containers:
+      - name: container1
+        image: hacker123shiva/springbt-in-docker:latest
+        resources:
+          limits:
+            cpu: "0.3"
+            memory: 333Mi
+...
+
+*As In the above manifest-yml namespace is configured to have 5 pods, 1 CPU and memory to be 1 GB
+*The resource-quoda-deployment.yml is applied to deploy 3 pos, each consuming 0.3 times the part of Cpu and 333mb of memory
+
+So, when we run “kunectl get quota”
+We’ll see pods to be 3/5
+Cpu to be 0.9/1
+Memory to be 999/Gi
+
+And when we run “kubectl get pods” we’ll get only 3 pods
+Even if we increase replicas —> 5
+We’ll only get 3 replicas due to the limitations 
