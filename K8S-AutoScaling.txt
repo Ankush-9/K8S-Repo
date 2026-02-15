@@ -1,0 +1,67 @@
+# AutoScaling :
+~ Autoscaling is the process of increasing/decreasing infrastructure resources based on the demand(app traffic, memory, CPU).
+~ Scaling is of two types :
+	—> Horizontal Scaling
+	—> Vertical Scaling
+
+# Horizontal Scaling:
+~ It refers to increasing the no. Of machines/servers 
+	eg. We have 3 pods and as traffic increases Pods are increased to 6
+~ Kubernetes supports Horizontal Scaling and is widely used
+~ Scale out —> increasing resources(pods/servers)
+~ Scale in —> decreasing resources
+
+# Vertical Scaling:
+~ In Vertical Pod Scaling we increase resources of same system i.e. the capacities
+~ eg. It is like having 4 CPUs instead of 2 CPUs, 4GB ram instead of 2 GB ram
+~ It is less common than Vertical Scaling
+~ Scale up —> increasing the resources
+~ Scale down —> decreasing the capacity(resources)
+
+#Note:
+*In K8S Vertical Scaling is less common because Pods are meant to be light-weight, but we can use Vertical Pod autoscaler(by installing and configuring some components)
+
+# HPA :
+~ HPA stands for Horizontal Pod Autoscaler(or Autoscaling)
+
+# VPA :
+~ VPA stands for Vertical Pod Autoscaler(or Autoscaling)
+
+# Requirements:
+~ We require Kubernetes Metric Server —> also called Heapster
+~ Heapster is a deprecated version of Metric Server
+
+# Kubernetes Metric Server:
+~ It is used to monitor the overall health and performance of K8S cluster, providing data needed for Kubernetes features like HPA
+~ HPA interacts with this Metric Server to identify CPU/memory utilization of POD
+~ This Metric server collects information like CPU , RAM , etc. for all pods and nodes in the cluster
+~ Metric server will not be present by default in K8S cluster, it requires installation
+
+#Installation of Heapster:
+~ Use any of the Ai tools to get help in installation of K8S Metric Server
+
+~ Follow the commands below to install k8s metric server:
+	kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+
+	kubectl patch deployment metrics-server -n kube-system \
+  --type='json' \
+  -p='[
+    {"op":"add","path":"/spec/template/spec/containers/0/args/-","value":"--kubelet-insecure-tls"},
+    {"op":"add","path":"/spec/template/spec/containers/0/args/-","value":"--kubelet-preferred-address-types=InternalIP"},
+    {"op":"add","path":"/spec/template/spec/containers/0/args/-","value":"--kubelet-use-node-status-port"}
+  ]'
+
+	kubectl rollout restart deployment metrics-server -n kube-system
+
+	 kubectl get pods -n kube-system
+
+	kubectl top nodes
+
+	kubectl top pods -A
+
+# Commands :
+
+*Pending*
+
+
+
