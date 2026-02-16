@@ -1,0 +1,12 @@
+# Persistent Volume(PV) :
+
+~ If we delete Pod, data is also lost ,this is because data is stored locally on the pod ==> stateless
+~ Every pod created for now is stateless
+
+~ If we delete a Pod and data is persistent i.e. present permanently ==> stateful
+~ We can store data in external storage such as AWS EBS,etc….
+
+~ K8S Persistent Volume helps us to manage storage for applications(pods) running in K8S cluster
+~ The Pods and storage we’ll be creating will be independent of each other and we’ll have to connect them
+~ Therefore , Persistent Volumes are independent of pods and they exist even if pods are not using them
+
