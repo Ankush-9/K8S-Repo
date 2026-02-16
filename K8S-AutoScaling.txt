@@ -59,9 +59,12 @@
 
 	kubectl top pods -A
 
-# Commands :
+# Commands :                                                                                                                                                                                                      
+~ kubectl get hpa : Displays the list of Horizontal Pod Autoscalers (HPA) in the current namespace along with their current CPU usage and replica count.
+~ kubectl top nodes : Shows CPU and memory usage of all cluster nodes, helping you monitor node-level resource consumption.
+~ kubectl top pods : Displays CPU and memory usage of pods, useful for checking which pods are consuming more resources.
+~ kubectl autoscale deployment <deployment-name> --cpu=20% --min=2 --max=10 : Creates an HPA for a deployment, automatically scaling pods between 2 and 10 replicas to maintain 20% average CPU utilization. --> The replicas can be scaled to maximum of 10 when utilization crosses or is at the threshold of 20%
 
-*Pending*
 
 ===========================
 # Practical :
