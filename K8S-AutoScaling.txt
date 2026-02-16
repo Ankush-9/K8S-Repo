@@ -63,5 +63,79 @@
 
 *Pending*
 
+===========================
+# Practical :
+~ Connect to the eks-host-vm
+~ Follow the above installation steps to install k8s metric server
+~ kubectl top nodes
+~ vi auto-scale.yml
+~ i
+    ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: depsvc
+  labels:
+    app: ankush
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: ankush
+  template:
+    metadata:
+      labels:
+        app: ankush
+    spec:
+      containers:
+      - name: container1
+        image: hacker123shiva/springbt-in-docker:latest
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+...
+~ esc + :wq
+~ kubectl apply -f auto-scale.yml
+~ kubectl get pods
+~ kubectl top pods
+
+*To implement Hpa use the following command
+kubectl autoscale deployment <deployment-name> --cpu=20% --min=2 --max=10
+
+*We can also use manifest-yml to implement hpa
+
+# Example for hpa-manifest-yml :
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: depsvc
+  labels:
+    app: ankush
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: ankush
+  template:
+    metadata:
+      labels:
+        app: ankush
+    spec:
+      containers:
+      - name: container1
+        image: hacker123shiva/springbt-in-docker:latest
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+...
+
+~ kubectl apply -f hpa-manifest.yml
+
+# Notes:
+*1000m = 1 CPU
 
 
