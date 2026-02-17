@@ -10,3 +10,107 @@
 ~ The Pods and storage we’ll be creating will be independent of each other and we’ll have to connect them
 ~ Therefore , Persistent Volumes are independent of pods and they exist even if pods are not using them
 
+# K8S Persistent Claim (PVC):
+
+~ The PVC is a request for storage made by an application(pod) or user.
+~  It consumes the Persistent Volume(PV) resource.
+Eg. 	Suppose we have a K8S cluster with 2 Pods within in i.e. the application
+	we’ll use the AWS EBS Volumes concept 
+	we’ll create a Volume in AWS EBS of some n storage and this needs to be attached to the K8S cluster
+	we’ll have a persistent volume in the K8S cluster. Pod needs to use it.
+	To claim this persistent volume we have an intermediate modem between PV and Pods which is the PVC
+~ The PVC can be as many as required ,either each for an individual Pod or a single PVC for multiple pods
+
+~ PVc is a request for a specific amount of persistent storage with a defined access mode
+~ A Persistent Volume Claim (PVC) is a Kubernetes object that acts as a user's request for, or claim to, physical storage (a Persistent Volume, or PV) in a cluster.
+
+# K8S Pod Statuses:
+—>ContainerCreating : This is a waiting state, k8s is trying to create a Pod. K8S kubelet is performing several operations such as pulling image,stting up container runtime environment to create pod
+—>Error : It basically mentions failure state
+—>CrashLoopBackOff : It indicates that kubelet is trying to run the container, but it keeps failing and crashing even after multiple attempts. Container keeps failing repeatedly
+—>ImagePullBackOff : It is also a failure state where image mentioned to pull is wrongly spelled or not present.K8S fails to pull an image.
+
+# Practical :
+
+~ Connect o eks-host-vm and create a cluster
+~ Go at AWS web console —> EC2 —> Elastic Block Store —> Volumes —> Create a Volume
+~ Rename it for easy accessibility
+~ Copy Volume Id
+~ vi persistent.yml
+~ i(Insert mode)
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pvsvc
+spec:
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteOnce
+  awsElasticBlockStore:
+    volumeID: vol-070ed857b28867db4
+    fsType: ext4
+...
+~ esc —> :wq
+~ kubectl create -f persistent.yml
+~ kubectl get pv
+
+—> Our Next Step is to Claim using the PVC
+~ vi pvc-manifest.yml
+~ i
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvcsvc
+spec:
+  accessModes: 
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+...
+~ esc —> :wq
+~ kubectl apply -f pvc-manifest.yml
+
+—> Creating the Pods 
+
+~ vi pvdeployment.yml
+~ i
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pvdepsvc
+  labels:
+    app: ankush
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ankush
+  template:
+    metadata:
+      labels:
+        app: ankush
+    spec:
+      containers:
+      - name: container1
+        image: centos
+        volumeMounts:
+        - name: pvsvc            
+          mountPath: "/tmp/persistent"
+      volumes:
+      - name: pvsvc
+        persistentVolumeClaim:
+          claimName: pvcsvc
+...
+~ esc —>:wq
+~ kubectl apply -f pvdeployment.yml
+
+# Commands:
+~ kubectl get pv : It is used to get the information regarding the created persistent volumes
+~ kubectl get pv -o wide : this command is used to give additional information about active persistent volumes
+~ kubectl describe pv pvsvc : This command is sued to give detailed information about a named persistent volume
+
