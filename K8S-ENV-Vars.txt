@@ -1,0 +1,109 @@
+# K8S ENV Vars :
+==============================================
+~ It is a way to pass config information to container running within the pods 
+
+~ ENV Variables have two categories~
+	—> ENV
+	—> Configmaps and Secrets : ENV FROM
+
+~ ENV : ~ ENV stands for environment
+~ It sets the environment variables for a container
+
+~ Configmaps and secrets :
+~ It is used to store the information in key-value pair, files or command line arguments that can be used by pods within the cluster
+*If data being used is confidential and requires encryption we use the concept of secrets
+*If data is non-confidential in that case we use Configmaps
+
+*1Mb is the limit for Configmaps
+*If we require more than 1Mb we can use separate database or filesystem
+
+*So far the operations performed by us are done using the yml-maifest files —> we can also create deployments without manifest-files which is done as ~
+	Syntax~
+	kubectl create deploy <deployment-name> --image=<image-name>
+	Example~
+	kubectl create deploy newdb —image=mariadb 
+*We’ll get an error using the above example as password is not passed
+*To get information about the pod use~
+	kubectl logs <pod-name>
+*We get error as “CrashLoopBackOff” —> You need to specify one of MARIADB_ROOT_PASSWORD, MARIADB_ROOT_PASSWORD_HASH, MARIADB_ALLOW_EMPTY_ROOT_PASSWORD and MARIADB_RANDOM_ROOT_PASSWORD
+
+# Solution:
+==============================================
+~ Us the following command to set the password as an environment variable
+	kubectl set env deploy <deployment-name> <pass-parameter>=<your-password>
+	eg.
+	kubectl set env deploy newdb MARIADB_ROOT_PASSWORD=ankush
+
+# Using Config files to set env variables:(Using ConfigMaps)
+==============================================
+~ kubectl create deploy needs --image=mariadb
+~ kubectl get pods 
+	*Error given
+~ vi vars
+~ i(Insert Mode)
+MARIADB_ROOT_PASSWORD=root123
+MARIADB_USER=root
+~ esc —>:wq
+
+*Now create Configmaps(we can also use yml-manifest as well)
+	Syntax
+	~ kubectl create cm <config-map-name> —from-env-file=<name-of-configured-file>
+	Example
+	~ kubectl create cm dbvars —from-env-file=vars
+
+~ kubectl get cm —> To get the list of active/created configmap
+~ kubectl describe cm <cm-name> —> This command is used to describe in detail a named config map
+
+*To map dbvars and deployment use ~
+Syntax
+~ kubectl set env deploy <deployment-name> --from=configmaps/<config-map-name>
+Eg.
+~ kubectl set env deploy newdb --from=configmaps/dbvars
+
+~kbectl get pods
+	No ERROR
+
+*Passwords should not be exposed as in this case(ConfigMaps)
+
+# Using Secrets to set env variables : (using Secrets)
+==============================================
+~ kubectl create deploy needs --image=mariadb
+~ kubectl get pods 
+	*Error given
+~ vi vars
+~ i(Insert Mode)
+MARIADB_ROOT_PASSWORD=root123
+MARIADB_USER=root
+~ esc —>:wq
+
+*Create secrets using~
+	Syntax
+	~ kubectl create secret generic <secret-name> --from-env-file=<configured-variable-filename>	
+	Example
+	~ kubectl create secret generic my-secret --from-env-file=vars
+
+~ kubectl get secrets
+~ kubectl describe secrets <secret-name>
+	eg.—> kubectl describe secrets my-secret
+
+*Set the vars using the following command
+Syntax
+	~ kubectl set env deploy <deployment-name> —from=secrets/<configured-secrets-name>
+Example
+	~ kubectl set env deploy newdb —from=secrets/my-secret
+
+~ kubectl get pods
+	—> No ERROR
+
+~ kubectl get secrets my-secret -o yaml
+	—> This command gives us the secrets in the encrypted format
+
+# Notes :
+==============================================
+~ Can we Decode Secrets?
+—>  Actually the encryption format to encrypt the credentials is base64
+	We can decode the credentials using the following command:
+	echo -n <encrypted-data> | base64 —decode 
+
+
+
