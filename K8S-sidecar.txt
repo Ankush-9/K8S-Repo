@@ -1,0 +1,46 @@
+# K8S Sidecar :
+~ In a Multi-container pod ,where we have multiple containers(running instances of images)
+~ If there exists a relationship between the containers ->One is the app runner while the other acts as a helper to the main container
+~ The helper container is called the sidecar ,technically
+
+# K8S Sidecar MultiContainer Pattern :
+~ It is basically used to enhance the functionality of a primary application
+~ Sidecar handles cross cutting concern I.e. the supporting logic
+~ Sidecar pattern ->To enhance and Support the main application at the run-time
+
+#Eg. YAML-File for above illustration :(hardcoded from internet)
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: scpod
+spec:
+  containers:
+  - name: log-gen
+    image: alpine:latest
+    command: ["/bin/sh", "-c"]
+    args:
+      - |
+        while true;
+        do
+          echo "$(date) - Log entry from primary container" >> /var/log/app.log;
+          sleep 5;
+        done
+    volumeMounts:
+      - name: shared-logs
+        mountPath: /var/log
+
+  - name: log-sidecar-nginx
+    image: nginx:latest
+    ports:
+      - containerPort: 80
+    volumeMounts:
+      - name: shared-logs
+        mountPath: /usr/share/nginx/html
+
+  volumes:
+    - name: shared-logs
+      emptyDir: {}
+...
+
+*We can also have multiple supporting containers 
