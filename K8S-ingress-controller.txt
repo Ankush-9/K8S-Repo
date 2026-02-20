@@ -1,0 +1,158 @@
+# K8S Ingress Controller :
+~ In K8S the Ingress Controller acts like a smart router or reverse proxy for our cluster which will allow us to expose multiple services on a single load balancer
+~ It is basically used to route by host name(Ankush.com), route by path(/courses , /flights)
+~ Routing is of two types:
+	—> Path based routing : eg. /flights , /orders , etc.
+	—> Host-based routing
+
+Eg.  we have a cluster suppose and within it we have two applications(pods) within it —> flight app and car booking app —> basically deployments
+	—> As an end user we make a request ,based on the request to either app1 or app2 we implement a concept called Ingress Controller of class type nginx
+	—> Now this nginx Ingress Controller which creates a load balancer internally
+	—> Now if a request comes to the Controller eg. https://<load-balancer-url>/<appN>
+	—> Based on the request ,Nginx Ingress Controller redirects request to specific app
+
+~ We need Ingress controller to enforce the above illustration
+~ In EKS the most famous choice is NGINX Ingress Controller
+
+# Nginx :
+~ Nginx can be used as a web server (which serves static files i.e. basic html, css and so),host website directory and for Reverse Proxy
+~ Reverse proxy —> Forwards client requests to backend applications by adding features like load balancing
+
+*The K8S manifest files can be taken from the internet —> Ai Tools --> basic knowledge is sufficient 
+*Instead of exposing each service with a load balancer or NodePort, we can define rules for routing external HTTP/HTTPS traffic into services and Ingress controller actually implements these rules
+
+~ Example :
+
+—> nginx-app.yml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-app
+  template:
+    metadata:
+      labels:
+        app: nginx-app
+    spec:
+      containers:
+      - name: nginx-container
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+        env:
+        - name: TITLE
+          value: "NGINX APP1"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+spec:
+  type: ClusterIP
+  selector:
+    app: nginx-app
+  ports:
+  - port: 80
+    targetPort: 80
+
+—> httpd-app.yml
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: httpd-deploy
+  labels:
+    app: httpd-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: httpd-app
+  template:
+    metadata:
+      labels:
+        app: httpd-app
+    spec:
+      containers:
+      - name: httpd-container2
+        image: httpd:latest
+        ports:
+        - containerPort: 80
+        env:
+        - name:  TITLE
+          value: "APACHE APP2"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: httpd-service
+spec:
+  type: ClusterIP
+  selector:
+    app: httpd-app
+  ports:
+  - port: 80
+    targetPort: 80
+...
+
+—> ingress.yml
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: app-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  ingressClassName: nginx
+  rules:
+  - http:
+      paths:
+      - path: /nginx(/|$)(.*)
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: nginx-service
+            port:
+              number: 80
+      - path: /httpd(/|$)(.*)
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: httpd-service
+            port:
+              number: 80
+
+*We need to install ingress controller to be installed before running the above manifest-yml files
+*Use the command below to install nginx ingress controller
+	kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.14.3/deploy/static/provider/cloud/deploy.yaml
+
+*Now after installation follow the commands below:
+~ kubectl apply -f nginx-app.yml
+~ kubectl apply -f httpd-app.yml
+~ kubectl apply -f ingress.yml
+
+~ kubectl get ing : This command is used to get list of ingress controllers created
+~ We also get an address —> It is a load balancer address
+
+# Observations:
+~ Copy the address and open the browser
+~ Hit as below to get results as per reference to above yml-manifest-files
+		<load-balancer-url-address>/nginx
+		<load-balancer-url-address>/httpd
+Eg. http://a4e178b862646409ea071d0ddc7a1b09-1356430998.ap-south-1.elb.amazonaws.com/httpd
+      http://a4e178b862646409ea071d0ddc7a1b09-1356430998.ap-south-1.elb.amazonaws.com/nginx
+
+	
