@@ -1,0 +1,11 @@
+# HELM
+=========================
+~ We have package managers as
+	Amazon Linux/Red hat : yum
+	Ubuntu : apt
+~ Likewise, HELM is also a package manager to install the required softwares in k8s cluster
+~ It is basically an easier approach to install required softwares similar to yum/apt package managers in Linux Distributions
+
+~ HELM uses charts in order to achieve this
+~ Charts refers to collection of configuration files i.e. all the manifest-yml files
+~ Using HELM charts we can install Prometheus server ,Grafana Server,….and so on
