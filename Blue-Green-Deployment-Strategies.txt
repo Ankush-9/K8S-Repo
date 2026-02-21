@@ -1,0 +1,44 @@
+# Blue-Green-Deployment Strategies :
+~ It is one of the strategies used the industry for deployment for the purpose of releasing applications
+~ We do have other strategies for deployment
+~ There are different opinions on this strategy as it’s an old methodology but still used in some firms
+
+~ Advantages:
+-> It reduces risk and minimizes application’s down time
+
+*When our application is live to the world we term it as deployment
+
+~ Every app has multiple releases where with every release new features, bug fixes ,security updates and so are appended to the existing app
+~ For a heavy application, it takes some time to deploy the newer versions of the app 
+~ The time may vary from minutes to hours depending on the size of the app
+
+~ The re-developed or new features requires creating of new pod
+~ The older pods needs to be deleted while new are required to be created and added
+~ For the process of deletion and re-deployment of pods our app will be down —> App becomes un-accessible
+~ Also, suppose if latest Pods have some issues? —> new release has some major bugs
+~ We cannot keep both the old and new bods simultaneously
+
+# Solution to this!
+~ To Solve the above issues we use the Blue-Green-Deployment Strategies
+~ We use two production Environments known as blue and green environments
+
+~ In both the environments we have shared resources(like database), App(pods) and Services
+~ We have router to route traffic 
+~ As the end user tries to access the application and while the application is live in an environment —> An environment (out of the two either blue or green) is active to the world(end users) while the other is present only for testing purpose
+~ The thing is after the testing is over so now, the new app needs not to be deployed just a small change in service exposure
+~ Within few seconds the end users will be routed to the new application
+~ Also the old env is not deleted at all ,it’s present in the other environment
+~ If any issue occurs in the new release the traffic can be re-routed to the old environment while the team fixes the issue
+
+~ Further if the new release is functional normally, the old environment is deleted and further as per requirement a new environment is created with new releases and bug fixes and same steps are followed
+
+~ In the steps illustrated above the blue-green deployment strategy is used in the industry
+
+*We can call the active env as green while the old as blue and vice versa 
+*We do have other strategies also, but few advantages are related to this strategy which are :
+	—> Zero Downtime 
+	—> Rapid Releases
+	—> Easy rollbacks
+	—> Good customer experience 
+
+
