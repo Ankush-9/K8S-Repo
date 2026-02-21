@@ -1,0 +1,33 @@
+# EFK (Elasticsearch ,Fluentd and Kibana):
+~ Monitoring the cluster and Monitoring the application are different scenarios 
+
+~ Application has logs which are maintained —> To monitor the application for debugging and so we use logs
+~ We need to implement the concept[ of logging in our application to monitor deployed applications 
+~ Logs not only contain the faults but also the normal working history of the apple
+~ Logs can be collected and checked in different ways
+
+*Refer to diagrams for better illustration
+
+~ Three Components Of EFK are:
+	-> ElasticSearch
+	-> Fluentd
+	-> Kibana
+
+*We do have alternatives for EFK as well, one is SPLUNK which is paid
+
+~ Kibana : It gives us an UI for visualisation of all our applications and checking our applications
+~ Elasticserach : It is basically a place where the collection of logs is present.
+~ Fluentd : It collects the logs from the cluster and redirects them to elastic search
+
+*Refer to images from internet for diagram
+
+~ Statefulset : It is required to be always present.       Elasticsearch—>statefulset 
+~ Daemonset : It is there to make sure every node has a running pod.      Fluentd—>Daemonset
+
+*Whatever apps we have to be running in our cluster have some logs which are collected by the component “fluentd” and bases on the indexes it stores them into the elastic search
+*Using the component Kibana we get a beautiful interface for monitoring the logs in a well organised and good visual appearance format
+
+*But to achieve the above we require to implement the log concept
+Eg. in springboot we use log4j to implement log concept
+
+*Every Pod generates logs,Fluentd collects and redirects them to elastic search and Kibana collects the logs and creates a dashboard to monitor the logs
