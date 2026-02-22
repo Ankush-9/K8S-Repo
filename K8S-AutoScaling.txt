@@ -111,29 +111,21 @@ kubectl autoscale deployment <deployment-name> --cpu=20% --min=2 --max=10
 # Example for hpa-manifest-yml :
 
 ---
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: depsvc
-  labels:
-    app: ankush
+apiVersion: autoscaling/v2 kind: HorizontalPodAutoscaler metadata:
+name: hpasvc
 spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: ankush
-  template:
-    metadata:
-      labels:
-        app: ankush
-    spec:
-      containers:
-      - name: container1
-        image: hacker123shiva/springbt-in-docker:latest
-        resources:
-          requests:
-            cpu: "100m"
-            memory: "128Mi"
+scaleTargetRef:
+apiVersion: apps/v1 kind: Deployment
+name: depsvc minReplicas:
+2
+maxReplicas:
+10
+metrics:
+- type: Resource resource:
+name: cpu
+target:
+type: Utilization
+averageUtilization: 20
 ...
 
 ~ kubectl apply -f hpa-manifest.yml
