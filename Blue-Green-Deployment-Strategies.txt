@@ -41,4 +41,128 @@
 	—> Easy rollbacks
 	—> Good customer experience 
 
+#Alternatives to Blue-Green-Deployment
 
+—>Canary Deployment(best for risk mitigation)
+	Canary Deployment releases the new version to a small subset of users first(the “canary” group).Traffic is gradually increased to the new version as confidence grows, allowing for real world testing and early detection of bugs.
+—>Shadow Deployment
+	Shadow deployment (or "dark launching") is a deployment strategy where a new version of an application or AI model runs alongside the current production version, receiving a copy of live traffic but not returning results to users. 	It allows for real-world testing, performance validation, and bug detection without impacting actual user experience.
+ —> A/B Testing
+	It is similar to Canary Deployment but traffic is routed based on user characteristics(e.g. location, cookies , device) to test different features/UI/workflows.
+ —> Recreate
+	Shuts down all the old pods before creation of new pods	
+
+*We have so many deployment strategies available with K8S which are used as per demand
+*Blue-Green is an old deployment which was used for a longer stretch of time
+
+# Blue-Green-Deployment Practical:
+*The first release is the blue deployment
+*live-service is to deploy our application
+*pre-prod yml file is to access the application of green deployment because we are just switching the pods
+	—>Entire traffic is not routed to green deployment i.e. blue is live to the world
+	—>Initially the green deployment is used by the testing team only
+
+-> blue-deployment.yml
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-app-deployment
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: java-web-app
+      version: v1
+      color: blue
+  template:
+    metadata:
+      labels:
+        app: java-web-app
+        version: v1
+        color: blue
+    spec:
+      containers:
+      - name: javawebappcontainer
+        image: hacker123shiva/springbt-in-docker:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+...
+
+->green-deployment.yml
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-app-deployment-green
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: java-web-app
+      version: v2
+      color: green
+  template:
+    metadata:
+      labels:
+        app: java-web-app
+        version: v2
+        color: green
+    spec:
+      containers:
+      - name: javawebappcontainer
+        image: hacker123shiva/springbt-in-docker:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+...
+
+->live-service.yml
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-app-live-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: java-web-app
+    color: green
+  ports:
+  - port: 80
+    targetPort: 8080
+...
+
+->pre-prod.yml
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-app-prod-service
+spec:
+  type: NodePort
+  selector:
+    app: java-web-app
+    color: green
+  ports:
+    - port: 80
+      targetPort: 8080
+      protocol: TCP
+      nodePort: 31725
+...
+
+—> kubectl apply -f blue-deployment.yml
+—> kubectl apply -f live-service.yml
+—> kubectl apply -f green-deployment
+—> kubectl apply -f pre-prod.yml
+
+*The only changes to be made to switch from blue—>green or vice versa we can use the live-service yml file to make changes
+—>The only change to be made is to change the color only 
+
+*Make changes in the non-live deployment apply them using “kubectl apply -f blue-deployment.yml”
+*As changes are made in the live-deployment we have to reapply them using “kubectl apply -f live-service.yml”
