@@ -158,10 +158,10 @@ spec:
 
 —> kubectl apply -f blue-deployment.yml
 —> kubectl apply -f live-service.yml
-—> kubectl apply -f green-deployment
+—> kubectl apply -f green-deployment.yml
 —> kubectl apply -f pre-prod.yml
 
-*The only changes to be made to switch from blue—>green or vice versa we can use the live-service yml file to make changes
+*The only changes to be made to switch from blue—>green or vice versa is to use  the live-service yml file to make changes
 —>The only change to be made is to change the color only 
 
 *Make changes in the non-live deployment apply them using “kubectl apply -f blue-deployment.yml”
