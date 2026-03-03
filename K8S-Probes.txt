@@ -1,0 +1,12 @@
+# Kubernetes Probes
+-> liveness probe
+-> readiness probe
+
+Readiness probe : If our app is ready to receive traffic, but it fails due to some reason, k8s stops sending new requests to that pod and doesn’t restart the pod.
+				When to allow and when to stop the traffic, can be determined using the readiness probe.
+				—> Basically it talks about traffic routing(stops sending new connections/requests to pods which are not ready)
+
+Liveness probe : If our pod or application is alive and healthy, if it fails k8s will restart the container.
+			     When to restart the container when issue is not resolved.
+			      —> Basically means Container restart.
+		
