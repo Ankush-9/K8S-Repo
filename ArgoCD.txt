@@ -47,3 +47,39 @@ Eg. replicas are changed from 4 to 10 ,to do so we have make changes in k8s-mani
 ~ Provide the username “admin” and password using the password access command and sign in
 ~ We’ll be logged in to the ArgoCD web server UI
 ~ For now we don’t have any deployed applications here
+
+*We had deleted the cluster and now when we created the cluster we had to add repo and perform the configurations again to access the ArgoCD web server UI
+*Access the server UI using the LoadBalancer URL and login using the credentials 
+
+# ArgoCD WebServer Practical :
+~ After Successful sign in we are on the home page of ArgoCD webserver UI
+~ Now we want to add a new application 
+~ Click on New App
+~ Next up configure parameters as~
+	Application name : product
+	Project Name : default
+	Sync Policy : Automatic
+	Repository URL : https://github.com/Haider7214/k8s-argocd.git
+	Path : ./
+	Cluster URL : Select Default from drop down
+	Namespace : default
+~ Click “Create App”
+~ The App will be deployed after the health status is healthy and synced
+~ If we open it we’ll see 3 replicas being created, this is because the no. Of replicas configured in the Repo are 3
+*We can use the command “kubectl get pods” to see the no. Of pods in running state or,
+ We can access the information using the web UI
+~ Now, if we make a new commit where. The no. Of replicas have been changed from 3 to 6 and the changes are committed
+~ Now we’ll have to click on sync —> Then Click on Synchronise —> After Synching 6 replicas will be created of the same app
+
+~ When we click on the created app we’ll have two parameters as per the practical one is the service -> teluskoappsvc while the other is the deployment -> product-deployment which further creates a resultset which is responsible for 
+creation of specified no. Of pods
+
+*As we make changes and commit those changes -> we’ll have to come to our ArgoCD dashboard and click on Sync and automatically the changes will be made to the deployed app
+
+*We also have options like history and Rollback option using which we can check the history of changes and even rollback them
+
+*It’s a very easier approach to manage our applications 
+*For Kubernetes ArgoCD is the best option for CI/CD 
+
+~ kubectl delete all —all : This command deletes all the pods, including those deployed using the ArgoCD Server
+
