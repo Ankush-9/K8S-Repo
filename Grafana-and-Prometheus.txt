@@ -1,0 +1,81 @@
+#Grafana and Prometheus :
+~ Grafana and Prometheus are used to monitor the entire cluster
+~ We can also use these tools for monitoring servers
+
+# Observability:
+~ In the world of devops observability refers to the tools and methodologies that helps developments and DevOps team to log,collect and analyse performance to get insights
+->Monitor 
+->Logs 
+->Alerts
+
+#Grafana:
+~ Grafana is built on the principle that data should be accessible to everyone in our organisation 
+~ Grafana helps to facilitate a culture where data can be easily used ;helping to break-down and empower teams for decision making
+~ Grafana provides us with a dashboard where we can visualise the data from our K8S Cluster or different cloud services or even from google sheets
+
+*Grafana is basically used for Visualisation
+
+~ Grafana internally uses a datasource for visualisation named as Prometheus 
+
+#Prometheus
+~ Prometheus is an open source tool for monitoring which acts as a datasource for Grafana
+~ Prometheus is the tool which actually monitors the applications or servers —> It collects the metrics(information about parameters like cpu, memory) over time while,
+   Grafana creates a dashboard and displays the information
+
+*We do have another datasource tool named as Grafana Loki which can be used to monitor
+
+*We can call these tools as log aggregation tools —> One which collects logs
+
+*For performing everything creation of namespace is recommended -> Not compulsory but highly recommended
+
+~ kubectl create ns prometheus
+~ kubectl create ns grafana
+
+#Installation of Prometheus:
+~ Go to artifacthub and search for “promotheus”
+~ Select the one from a verified publisher
+~ Click on “install” 
+~ Copy and perform the command based operations:
+	Add Repo
+	-> helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+	Install Prometheus
+	- > helm install my-prometheus prometheus-community/prometheus --version 28.13.0 —namespace prometheus
+~ We get a message as :
+	For more information on running Prometheus, visit:
+	https://prometheus.io/
+~ The above message means prometheus is running in this url we can access prometheus by visiting this URL
+~ Update the helm
+	helm repo update
+~ kubectl get all -n prometheus
+
+#Installation of Grafana:
+~ Go to artifacthub.io and search for “grafana”
+~ Select the one from a verified publisher
+~ Click on “Install”
+~ Copy and perform the command based operations:
+	Add Repo
+	-> helm repo add grafana-community https://grafana-community.github.io/helm-charts/
+	Install Grafana
+	-> helm install my-grafana grafana-community/grafana --version 11.3.0 —namespace grafana
+~ Update the helm
+	helm repo update
+~ kubectl get all -n grafana
+
+*Now verify whether the two repositories are installed or not by using the following command~
+~ helm repo list
+*The above command lists all the repositories which are actively present
+
+~ Change Service Type of Grafana as ~
+	 kubectl patch svc my-grafana -n grafana -p '{"spec": {"type":"LoadBalancer"}}'
+
+~ kubectl get all -n grafana
+   Now using the external IP of my-grafana i.e Load Balancer URL we can access the Server UI for Grafana
+~ We can check the pod status in grafana namespace using the command below~
+	kubectl get pods -n grafana
+
+#For Deletion of resources use the following commands~
+~ kubectl delete all —all -n grafana
+~ kubectl delete all —all -n prometheus
+
+
+
