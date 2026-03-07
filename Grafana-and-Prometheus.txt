@@ -26,6 +26,14 @@
 
 *We can call these tools as log aggregation tools —> One which collects logs
 
+#Installation of Metrics server:
+~ We are required to install the metrics server
+~ We can use Ai tools to get commands to install merics server
+~ Also, there might be scenarios such as error in links,resolving some errors or so at any instance of time
+~ For the time of installation of mertics server the used command is as follows :
+   kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+   kubectl patch deployment metrics-server -n kube-system --type='json' -p='[{"op":"add","path":"/spec/template/spec/containers/0/args/-","value":"--kubelet-insecure-tls"}]'
+
 *For performing everything creation of namespace is recommended -> Not compulsory but highly recommended
 
 ~ kubectl create ns prometheus
