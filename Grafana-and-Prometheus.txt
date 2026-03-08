@@ -85,5 +85,78 @@
 ~ kubectl delete all —all -n grafana
 ~ kubectl delete all —all -n prometheus
 
+*If we are working as a fresher, most likely we are part of the L1 team where we monitor dashboards 
+*We use Grafana ,where Grafana uses Prometheus
+*Prometheus collects metrics over-time
+
+*We can create a common namespace for both prometheus and grafana
+Eg. kubectl create ns monitoring
+
+#Practical Implementation:Setting 
+~ As we have created a cluster again the next day our namespaces are gone(deleted), while repos are present already
+~ Follow the instructions as below
+~ Get connected to VM where everything is configured and create the cluster
+~ helm version
+~ kubectl get ns
+~ helm repo list
+~ helm repo update
+~ helm install my-prometheus prometheus-community/prometheus \
+   -n monitoring \
+   --create-namespace \
+   --set server.persistentVolume.enabled=false \
+   --set alertmanager.persistentVolume.enabled=false
+
+*We require above configuration for Prometheus to avoid errors
+
+~ helm install my-grafana grafana-community/grafana --version 11.3.0 --namespace monitoring
+~ kubectl get all -n monitoring
+~ kubectl patch svc my-grafana -n monitoring -p '{"spec":{"type": "LoadBalancer"}}' or,
+   We can also use the command “kubectl edit svc my-grafana -n monitoring” to edit in the visual editor(vi) mode
+~ kubectl get all -n monitoring
+
+*Now,Copy the Load Balancer URL
+
+*Also get the password for admin using the command below~
+	kubectl get secret -n monitoring my-grafana -o jsonpath="{.data.admin-password}" | base64 -d ; echo
+
+~ Now Open the Load Balancer URL and login using the credentials
+~ We’ll be on the Home Screen of Grafana Server
+~ On the home page itself we have an option of “Data Source”
+~ The datasource we’re using for Grafana is Prometheus
+
+#Setting-Up Datasource:
+~ Click on “datasource” option
+~ We’ll have multiple datasource options
+~ Click on Prometheus
+~ Next up under Connection,Add server URL as~
+	http://prometheus-server.monitoring.svc.cluster.local
+~ Scroll down and click “Save and Test”
+~ We’ll either get errors or Successful execution message
+
+~ Next up, click on Dashboards and Click “Create Dashboard”
+~ We can either “Add Visualisation” or “import”
+~ Click on “import dashboard”
+~ Here is the website URL to explore and choose a dashboard as per requirement —> https://grafana.com/grafana/dashboards/
+~ However, we have to be specific to provide “Id” i.e. we choose a visualisation and it will have an ID
+~ We have to specify this id and next up click “Load
+~ Select “Prometheus” as the datasource
+~ Click “Import”
+
+~ We’ll now get info about different parameters
+~ The Id’s are specific to monitor different parameters 
+Eg.
+	14623 : to monitor k8s overview in general
+	15661: K8S Dashboard
+	6417 : Kubernetes Cluster
+	747 : pod metrics
+	1860 : Node Exporter Full
+
+~ We might get “No Data” as we have not done any deployments
+~ We might get some values which are for default resources
+
+*We can also create our own dashboard from scratch as per our requirements
+
+*Grafana can be set for anything (including Amazon Ec2 and so on) while we are using Grafana only for K8S cluster
+*We get a beautiful overview visual representation of our cluster where we can monitor everything
 
 
