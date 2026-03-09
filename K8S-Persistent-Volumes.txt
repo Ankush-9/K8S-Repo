@@ -48,11 +48,14 @@ spec:
     storage: 20Gi
   accessModes:
     - ReadWriteOnce
-  awsElasticBlockStore:
-    volumeID: vol-070ed857b28867db4
+  persistentVolumeReclaimPolicy: Retain
+  csi:
+    driver: ebs.csi.aws.com
+    volumeHandle: vol-07fd98a117ec5be6b
     fsType: ext4
 ...
 ~ esc —> :wq
+~ kubectl get pv
 ~ kubectl create -f persistent.yml
 ~ kubectl get pv
 
@@ -97,7 +100,8 @@ spec:
     spec:
       containers:
       - name: container1
-        image: centos
+        image: busybox
+        command: ["sleep", "10000"]
         volumeMounts:
         - name: pvsvc            
           mountPath: "/tmp/persistent"
@@ -113,4 +117,39 @@ spec:
 ~ kubectl get pv : It is used to get the information regarding the created persistent volumes
 ~ kubectl get pv -o wide : this command is used to give additional information about active persistent volumes
 ~ kubectl describe pv pvsvc : This command is sued to give detailed information about a named persistent volume
+
+~ eksctl utils associate-iam-oidc-provider --cluster Ankush-cluster1 --region ap-south-1 --approve
+~ eksctl create addon \                                                                           
+  --name aws-ebs-csi-driver \
+  --cluster Ankush-cluster1 \
+  --region ap-south-1
+~ kubectl apply -f pvdeployment.yml
+~ kubectl get pods
+--> Our Pod will be now in the running state
+~ kubectl exec -it pvdepsvc-8456bb77dd-h5lck -- /bin/sh
+--> The command above is used to login to our container
+~ cd /tmp
+~ cd /persistent
+~ touch f1.txt f2.txt f3.txt
+~ exit
+
+*Now delete the pod as:
+~ kubectl delete pod pvdepsvc-8456bb77dd-h5lck
+
+*Because of the Deployment we have Self-healing property i.e. the pod will be redeployed but with a different pod id
+
+~ Now we'll have a new pod with different pod id
+~ Follow as below:
+~ kubectl exec -it pvdepsvc-8456bb77dd-hp2rr -- /bin/sh
+~ cd /tmp
+~ cd /persistent
+~ ls 
+
+*We'll achieve the concept of persistency where our data remains intat regardless of state of resources
+
+~ exit
+~ kubectl delete all --all
+
+*Also, After usage delete the Volume from the AWS EC2 instances Volumes to avoid bills
+*We just mount persistent volumes to use the concept of persistency
 
