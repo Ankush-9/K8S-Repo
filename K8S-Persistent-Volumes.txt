@@ -118,7 +118,16 @@ spec:
 ~ kubectl get pv -o wide : this command is used to give additional information about active persistent volumes
 ~ kubectl describe pv pvsvc : This command is sued to give detailed information about a named persistent volume
 
+*EBS CSI driver is not installed on this cluster
+
+~ The old awsElasticBlockStore PVs rely on the in-tree AWS volume plugin, which is depricated and won't work on recent EKS versions (like > v1.32)
+~ We need to install AWS EBS CSI Driver
+~ This is required for any PV using csi:ebs.csi.aws.com
+
+*Associate IAM OIDC provider (if not done already):
 ~ eksctl utils associate-iam-oidc-provider --cluster Ankush-cluster1 --region ap-south-1 --approve
+
+*Create an addon as below:
 ~ eksctl create addon \                                                                           
   --name aws-ebs-csi-driver \
   --cluster Ankush-cluster1 \
