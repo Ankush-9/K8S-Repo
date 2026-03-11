@@ -31,3 +31,34 @@
 Eg. in springboot we use log4j to implement log concept
 
 *Every Pod generates logs,Fluentd collects and redirects them to elastic search and Kibana collects the logs and creates a dashboard to monitor the logs
+
+#EFK Practical Implementation:
+~ First of all we require a namespace (say efklogs)
+~ kubectl create ns efklogs
+~ Then, we require several yml files configured in order to implement efk
+~ We also require a basic yml to deploy an application using the service deployment
+~ Run all the yml files using the command
+~ kubectl apply -f .
+*or else use manually apply each yml file one by one
+~ kubectl get all -n efklogs
+~ Now copy the Load balancer URL of the Kibana
+~ It runs on the port no. 5601
+~ Next,up paste the link in your browser as :
+	<Load-balancer-URL>:5601
+~ We’ll be at the Kibana dashboard
+~ Now , we can explore various options on the webserver UI
+~ Our application will be available in some time
+
+~ kubectl get pods : Use this to verify if the ap is working fine or not
+~ We’ll see logs listed on the website in some time 
+~ If App does not implements the concept of logging then logs won’t be available
+
+*logs are all the activities which are being performed in the pods displayed in time specific format
+
+*Like EFK many tools are present 
+*EFK is free 
+*In industry we use SPLUNK (paid) which is very powerful tool
+
+#Major Difference between EFK and Grafana-and-Prometheus:
+~ EFK monitors application —> It is specific to an app
+~ Grafana and Prometheus are used to monitor the whole cluster 
